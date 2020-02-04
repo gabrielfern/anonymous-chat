@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anonymous Chat</title>
+    <style>
+        body {
+            margin: 0px;
+        }
+        p {
+            margin: 0px auto;
+            padding: 5px;
+        }
+        form {
+            margin: 0px auto;
+        }
+        @media only screen and (min-width: 600px) {
+            p {
+                width: 60%;
+            }
+            form {
+                width: 60%;
+            }
+        }
+        input[type=text] {
+            width: 70%;
+            padding: 0.5em;
+            border-radius: 5px;
+            border: #6c757d;
+            border-width: 1px;
+            border-style: solid;
+        }
+        input[type=submit] {
+            width: 15%;
+            padding: 0.5em;
+            background: #6c757d;
+            color: white;
+            border: 0;
+            border-radius: 5px;
+        }
+        #topBar {
+            background: white;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            top: 0;
+            width: 100vw;
+        }
+        #messageBoard {
+            top: 50px;
+            bottom: 50px;
+            position: fixed;
+            width: 100%;
+            overflow: auto;
+        }
+        #bottomBar {
+            background: white;
+            text-align: center;
+            padding-top: 10px;
+            padding-bottom: 10px;
+            position: fixed;
+            bottom: 0;
+            width: 100vw;
+        }
+    </style>
+</head>
+<body>
+    <div id="topBar">
+        Online: <span id="onlineCount"></span>
+    </div>
+    <div id="messageBoard"></div>
+    <div id="bottomBar">
+        <form action="javascript:sendMessage()">
+            <input type="text" id="messageInput" autocomplete="off">
+            <input type="submit" value="Send">
+        </form>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io()
+
+        const getColor = (() => {
+            index = 0
+            colors = ['#FCFCFC', '#F8F7F6']
+            return () => {
+                if (index >= colors.length)
+                    index = 0
+                return colors[index++]
+            }
+        })()
+
+        function appendMessage(message) {
+            let messageBoard = document.getElementById('messageBoard')
+            let p = document.createElement('p')
+            p.innerText = message
+            p.style.background = getColor()
+            messageBoard.appendChild(p)
+        }
+
+        function sendMessage() {
+            let messageInput = document.getElementById('messageInput')
+            if (messageInput.value)
+                appendMessage(messageInput.value)
+                socket.emit('message', messageInput.value)
+                messageInput.value = ''
+                document.getElementById('messageBoard').scrollTo(0, document.getElementById('messageBoard').scrollHeight)
+        }
+
+        socket.on('message', message => {
+            appendMessage(message)
+        })
+
+        socket.on('online-count', count => {
+            document.getElementById('onlineCount').innerText = count
+        })
+    </script>
+</body>
+</html>
