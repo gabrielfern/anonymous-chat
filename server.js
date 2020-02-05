@@ -4,7 +4,7 @@ const io = require('socket.io')(server)
 
 let html
 fs.readFile('index.html', (err, data) => {
-    if (err) throw err;
+    if (err) throw err
     html = data
     server.listen(3000)
 })
@@ -20,16 +20,15 @@ server.on('request', (req, res) => {
 
 function notifyOnlineCount() {
     io.clients((err, clients) => {
+        if (err) throw err
         io.emit('online-count', clients.length)
     })
 }
 
 io.on('connection', socket => {
     notifyOnlineCount()
-    console.log('New client:', socket.id)
 
     socket.on('message', message => {
-        console.log(message)
         socket.broadcast.emit('message', message)
     })
 
