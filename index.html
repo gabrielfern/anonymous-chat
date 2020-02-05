@@ -10,6 +10,10 @@
         body {
             margin: 0px;
             font-family: 'Nunito', sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: -webkit-fill-available;
+            max-height: -webkit-fill-available;
         }
         p {
             margin: 0px auto;
@@ -54,16 +58,16 @@
         #topBar {
             background: white;
             text-align: center;
-            padding: 10px;
-            position: fixed;
+            padding-top: 10px;
+            padding-bottom: 10px;
             top: 0;
             width: 100vw;
         }
         #messageBoard {
             top: 50px;
             bottom: 50px;
-            position: fixed;
             width: 100%;
+            flex: 1 1 auto;
             overflow: auto;
         }
         #bottomBar {
@@ -71,15 +75,15 @@
             text-align: center;
             padding-top: 10px;
             padding-bottom: 10px;
-            position: fixed;
             bottom: 0;
+            position: sticky;
             width: 100vw;
         }
     </style>
 </head>
 <body>
     <div id="topBar">
-        Online: <span id="onlineCount"></span>
+        Connecting...
     </div>
     <div id="messageBoard"></div>
     <div id="bottomBar">
@@ -102,30 +106,38 @@
             }
         })()
 
-        function appendMessage(message) {
+        function appendMessage(message, forceScroll) {
             let messageBoard = document.getElementById('messageBoard')
             let p = document.createElement('p')
             p.innerText = message
             p.style.background = getColor()
+            let scroll = false
+            if (messageBoard.scrollTop == (messageBoard.scrollHeight - messageBoard.offsetHeight))
+                scroll = true
             messageBoard.appendChild(p)
+            if (scroll || forceScroll)
+                messageBoard.scrollTo(0, messageBoard.scrollHeight)
         }
 
         function sendMessage() {
             let messageInput = document.getElementById('messageInput')
             if (messageInput.value) {
-                appendMessage(messageInput.value)
+                appendMessage(messageInput.value, true)
                 socket.emit('message', messageInput.value)
                 messageInput.value = ''
             }
-            document.getElementById('messageBoard').scrollTo(0, document.getElementById('messageBoard').scrollHeight)
         }
 
         socket.on('message', message => {
-            appendMessage(message)
+            appendMessage(message, false)
+        })
+
+        socket.on('disconnect', message => {
+            document.getElementById('topBar').innerText = 'Offline'
         })
 
         socket.on('online-count', count => {
-            document.getElementById('onlineCount').innerText = count
+            document.getElementById('topBar').innerText =  'Online: ' + count
         })
     </script>
 </body>
