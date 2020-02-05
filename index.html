@@ -112,11 +112,12 @@
 
         function sendMessage() {
             let messageInput = document.getElementById('messageInput')
-            if (messageInput.value)
+            if (messageInput.value) {
                 appendMessage(messageInput.value)
                 socket.emit('message', messageInput.value)
                 messageInput.value = ''
-                document.getElementById('messageBoard').scrollTo(0, document.getElementById('messageBoard').scrollHeight)
+            }
+            document.getElementById('messageBoard').scrollTo(0, document.getElementById('messageBoard').scrollHeight)
         }
 
         socket.on('message', message => {
