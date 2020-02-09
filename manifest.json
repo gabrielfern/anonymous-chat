@@ -1,0 +1,6 @@
+{
+    "name": "Anonymous Chat",
+    "display": "standalone",
+    "theme_color": "#fff",
+    "start_url": "/"
+}
