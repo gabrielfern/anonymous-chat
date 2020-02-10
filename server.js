@@ -5,6 +5,7 @@ const io = require('socket.io')(server)
 let html = fs.readFileSync('index.html')
 let manifest = fs.readFileSync('manifest.json')
 let icon = fs.readFileSync('icon.png')
+let sw = fs.readFileSync('sw.js')
 server.listen(process.env.PORT || 3000)
 
 server.on('request', (req, res) => {
@@ -14,6 +15,9 @@ server.on('request', (req, res) => {
         res.end(manifest)
     } else if (req.url == '/icon.png') {
         res.end(icon)
+    } else if (req.url == '/sw.js') {
+        res.setHeader('Content-Type', 'text/javascript')
+        res.end(sw)
     } else if (!req.url.startsWith('/socket.io')) {
         res.statusCode = 404
         res.end()
