@@ -105,8 +105,8 @@
         const socket = io()
 
         const getColor = (() => {
-            index = 0
-            colors = ['#FCFCFC', '#F8F7F6']
+            let index = 0
+            let colors = ['#FCFCFC', '#F8F7F6']
             return () => {
                 if (index >= colors.length)
                     index = 0
@@ -136,8 +136,25 @@
             }
         }
 
+        function showNotification(msg) {
+            Notification.requestPermission(res => {
+                if (res == 'granted') {
+                    navigator.serviceWorker.ready.then(reg => {
+                        reg.showNotification('New Message', {
+                            body: msg,
+                            icon: 'icon.png',
+                            badge: 'icon2.png'
+                        })
+                    })
+                }
+            })
+        }
+
         socket.on('message', message => {
             appendMessage(message, false)
+            Notification.requestPermission()
+            if (!document.hasFocus())
+                showNotification(message)
         })
 
         socket.on('disconnect', message => {
