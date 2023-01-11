@@ -14,6 +14,7 @@ let sw = fs.readFileSync('sw.js')
 server.listen(process.env.PORT || 3000)
 server.on('request', (req, res) => {
     if (req.url == '/' || req.url == '/index.html') {
+        res.setHeader('Content-Type', 'text/html')
         res.end(html)
     } else if (req.url == '/manifest.json') {
         res.end(manifest)
